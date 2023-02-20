@@ -14,14 +14,4 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
-
-#ifdef KEYBOARD_afternoonlabs_breeze_rev0
-#    include "rev0.h"
-#endif
-#ifdef KEYBOARD_afternoonlabs_breeze_rev1
-#    include "rev1.h"
-#endif
-#ifdef KEYBOARD_afternoonlabs_breeze_rev2
-#    include "rev2.h"
-#endif
+#include "breeze.h"
