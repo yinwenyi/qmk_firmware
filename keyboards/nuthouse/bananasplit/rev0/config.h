@@ -1,4 +1,4 @@
-/* Copyright 2021 Afternoon Labs
+/* Copyright 2023 Nuthouse
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@
 /* Set 0 if debouncing isn't needed */
 #define DEBOUNCE 5
 
-#define SOFT_SERIAL_PIN D0
+#define USE_I2C
 
 #define DIODE_DIRECTION COL2ROW
 
@@ -57,9 +57,9 @@
 
 /** STATUS LED CONFIG **/
 // noted that this might affect matrix scan speed
-#define SPLIT_LED_STATE_ENABLE
+//#define SPLIT_LED_STATE_ENABLE
 // which pin goes to the LED
-#define LED_CAPS_LOCK_PIN D5
+//#define LED_CAPS_LOCK_PIN D5
 
 
 /** KNOB CONFIG **/
@@ -78,18 +78,14 @@
 
 /** LED MATRIX CONFIG **/
 #define LED_DRIVER_COUNT 2
-#define LED_MATRIX_LED_COUNT 72
 #define LED_DRIVER_ADDR_1 0b1110100
 #define LED_DRIVER_ADDR_2 0b1110111
-#define LED_MATRIX_SPLIT { 36, 36 }
-// If LED_MATRIX_KEYPRESSES or LED_MATRIX_KEYRELEASES is enabled, you also will want to enable SPLIT_TRANSPORT_MIRROR
-
-
-
-
-
-
-
-
-
- 
+#define LED_DRIVER_1_LED_TOTAL 36
+#define LED_DRIVER_2_LED_TOTAL 36
+#define LED_MATRIX_LED_COUNT (LED_DRIVER_1_LED_TOTAL + LED_DRIVER_2_LED_TOTAL)
+/* number of backlight levels */
+//#define BACKLIGHT_LEVELS 3
+//#define LED_BRIGHTNESS_LO       100
+//#define LED_BRIGHTNESS_HI       255
+#define LED_DISABLE_WHEN_USB_SUSPENDED
+#define ENABLE_LED_MATRIX_BAND 

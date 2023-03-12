@@ -1,4 +1,4 @@
-/* Copyright 2021 eithanshavit
+/* Copyright 2023 yinwenyi
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,24 +16,6 @@
 
 #pragma once
 
-#include "config_common.h"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#ifdef KEYBOARD_nuthouse_bananasplit_rev0
+#    include "rev0.h"
+#endif

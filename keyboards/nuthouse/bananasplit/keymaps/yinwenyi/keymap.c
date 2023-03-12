@@ -1,4 +1,4 @@
-/* Copyright 2021 yinwenyi
+/* Copyright 2023 yinwenyi
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -80,7 +80,7 @@ bool encoder_update_user(uint8_t index, bool clockwise) {
             if (clockwise) { tap_code_delay(KC_VOLU, 10); } else { tap_code_delay(KC_VOLD, 10); }
             break;
         case 1:
-            if (clockwise) { rgb_matrix_increase_hue(); } else { rgb_matrix_decrease_hue(); }
+            if (clockwise) { tap_code_delay(KC_BRIU, 10); } else { tap_code_delay(KC_BRID, 10); } 
             break;
     }
     return false;
@@ -90,10 +90,10 @@ bool encoder_update_user(uint8_t index, bool clockwise) {
 bool dip_switch_update_user(uint8_t index, bool active) { 
     switch (index) {
         case 0:
-            tap_code_delay(KC_MUTE, 10);
+            register_code(KC_MUTE);
             break;
         case 1:
-            tap_code_delay(KC_MUTE, 10);
+            register_code(KC_MUTE);
             break;
     }
     return true;
