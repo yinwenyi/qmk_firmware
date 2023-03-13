@@ -56,11 +56,13 @@
 #define SPLIT_CONNECTION_CHECK_TIMEOUT 500
 
 /** STATUS LED CONFIG **/
-// noted that this might affect matrix scan speed
-//#define SPLIT_LED_STATE_ENABLE
-// which pin goes to the LED
-//#define LED_CAPS_LOCK_PIN D5
-
+#define RGB_DI_PIN D5
+#define RGBLED_NUM 2
+#define RGBLED_SPLIT {1, 1}
+#define RGBLIGHT_SLEEP
+#define RGBLIGHT_SPLIT
+// make it green
+#define RGBLIGHT_DEFAULT_HUE 64
 
 /** KNOB CONFIG **/
 #define ENCODERS_PAD_A_RIGHT { B7 }
@@ -88,4 +90,4 @@
 //#define LED_BRIGHTNESS_LO       100
 //#define LED_BRIGHTNESS_HI       255
 #define LED_DISABLE_WHEN_USB_SUSPENDED
-#define ENABLE_LED_MATRIX_BAND 
+#define ENABLE_LED_MATRIX_BAND
