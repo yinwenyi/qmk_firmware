@@ -36,3 +36,30 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //                                                                         └────────┴────────┘        └────────┴────────┘
   )
 };
+
+// The default behavior for the encoder dip switch does notion. The keyboard has setup the dip switch
+// such that index = 0 is the right side and index = 1 is the left side
+bool dip_switch_update_user(uint8_t index, bool active) { 
+   switch(index){
+      // Right side
+      case 0:{
+         if(active){
+            register_code(KC_MUTE);
+         } else{
+            unregister_code(KC_MUTE);
+         }
+         break;
+      }
+      // Left side
+      case 1:{
+         if(active){
+            register_code(KC_CAPS);
+         } else{
+            unregister_code(KC_CAPS);
+         }
+         break;
+      }
+   }
+
+   return true;
+}

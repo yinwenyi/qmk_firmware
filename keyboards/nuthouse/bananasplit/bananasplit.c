@@ -169,7 +169,9 @@ led_config_t g_led_config = {
 };
 #endif
 
-// encoder mapping
+//----------------------------------------------------------------------------------------------------
+// Encoder
+//----------------------------------------------------------------------------------------------------
 bool encoder_update_kb(uint8_t index, bool clockwise) {
     if (!encoder_update_user(index, clockwise)) {
       return false; /* Don't process further events if user function exists and returns false */
@@ -194,60 +196,57 @@ bool encoder_update_kb(uint8_t index, bool clockwise) {
     return true;
 }
 
-static bool dip_switch = false;
+//----------------------------------------------------------------------------------------------------
+// Encoder Dip Switch
+//----------------------------------------------------------------------------------------------------
+// Both sides keep track of the slave state through this variable
+static bool dip_switch_slave_state = false;
 
+// This function is called by dip_switch_read, which is continally invoked on the master side, but has
+// to be explicitly called on the slave side
 bool dip_switch_update_kb(uint8_t index, bool active) { 
-    if (!dip_switch_update_user(index, active)){ 
-        return false; 
-    }
-
+    // If we are on the slave side, then simply update the global variable and return
     if(!is_keyboard_master()){
-        dip_switch = active;
+        dip_switch_slave_state = active;
         return true;
     }
-
-    // There is only a single dip switch, so index will always be 0
-    if(active){
-        register_code(KC_MUTE);
-    } else{
-        unregister_code(KC_MUTE);
-    }
-
-    // action_exec((keyevent_t){
-    //     .key = (keypos_t){.row = isLeftHand ? 1 : 1, .col = 1},
-    //     .pressed = active, .time = (timer_read() | 1) /* time should not be 0 */
-    // });
-
+    
+    // Otherwise, we are on the master side. Call the user code.
+    if(!dip_switch_update_user((uint8_t)isLeftHand, active)){
+        return false;
+    } 
+        
+    // Keyboard-level behavior for the dipswitch does nothing
     return true;
 }
 
+// This handler on the slave side gets invoked by a transaction intiated from the master's side. 
+// It just reads the slave's dip state and sends it over to the master
 void keyboard_sync_dip_slave_handler(uint8_t in_buflen, const void* in_data, uint8_t out_buflen, void* out_data){
     dip_switch_read(false);
-    *(bool*)out_data = dip_switch;
+    *(bool*)out_data = dip_switch_slave_state;
 }
 
+// Initialize the communication between master and slave for synchronizing the dip switch state
 void keyboard_post_init_kb(void) {
     transaction_register_rpc(KEYBOARD_SYNC_DIP, keyboard_sync_dip_slave_handler);
     keyboard_post_init_user();
 }
 
+// This function is periodically run. The slave dip switch state synchronization is initiated on
+// the master's side
 void housekeeping_task_kb(void) {
-    if(is_keyboard_master()){
-        static uint32_t last_sync = 0;
-        if(timer_elapsed32(last_sync) > 100){
-            bool slave_dip_status = 0;
-            if(transaction_rpc_exec(KEYBOARD_SYNC_DIP, 0, NULL, sizeof(bool), &slave_dip_status)){           
-                last_sync = timer_read32();
-
-                if(dip_switch != slave_dip_status){
-                    if(slave_dip_status){
-                        register_code(KC_MUTE);
-                        
-                    } else{
-                        unregister_code(KC_MUTE);
-                    }
-                    dip_switch = slave_dip_status;
-                }
+    // Synchronize at most once every 100 ms
+    static uint32_t last_sync = 0;
+    if(is_keyboard_master() && timer_elapsed32(last_sync) > 100){
+        bool received_slave_state = false;
+        if(transaction_rpc_recv(KEYBOARD_SYNC_DIP, sizeof(bool), &received_slave_state)){           
+            last_sync = timer_read32();
+            // Only update the dip switch status on the master side if it's different on the slave side
+            if(dip_switch_slave_state != received_slave_state){
+                // This code is executed on the master's side, so isLeftHand needs to be negated for the slave
+                dip_switch_update_user((uint8_t)!isLeftHand, received_slave_state);
+                dip_switch_slave_state = received_slave_state;
             }
         }
     }
