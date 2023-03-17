@@ -17,6 +17,8 @@
 #pragma once
 
 #include "quantum.h"
+#include "split_util.h"
+#include "transactions.h"
 
 #define LAYOUT( \
 	L42, L41, L40,        L05, L04, L03, L02, L01, L00,		        R00, R01, R02, R03, R04, R05,        R40, R41, R42,	    \

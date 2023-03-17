@@ -57,6 +57,8 @@
 // How long (in milliseconds) the master part should block all connection attempts to the slave after the communication has been flagged as disconnected
 #define SPLIT_CONNECTION_CHECK_TIMEOUT 500
 
+#define SPLIT_TRANSACTION_IDS_KB KEYBOARD_SYNC_DIP
+
 /** STATUS LED CONFIG **/
 #define RGB_DI_PIN D5
 #define RGBLED_NUM 2
