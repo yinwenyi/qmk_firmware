@@ -28,79 +28,79 @@ const is31_led PROGMEM g_is31_leds[LED_MATRIX_LED_COUNT] = {
 //      K52,             K25, K24, K23, K22, K21, K20
 // K55, K54, K53         K35, K34, K33, K32, K31, K30
 //        	    	                               K51, K50
-    { 0, C2_1  }, // k00 
-    { 0, C3_1  }, // k01
-    { 0, C4_1  }, // k02
-    { 0, C5_1  }, // k03
-    { 0, C6_1  }, // k04
-    { 0, C7_1  }, // k05
-    { 0, C1_2  }, // k10
-    { 0, C3_2  }, // k11
-    { 0, C4_2  }, // k12
-    { 0, C5_2  }, // k13
-    { 0, C6_2  }, // k14
-    { 0, C7_2  }, // k15
-    { 0, C1_3  }, // k20
-    { 0, C2_3  }, // k21
-    { 0, C4_3  }, // k22
-    { 0, C5_3  }, // k23
-    { 0, C6_3  }, // k24
-    { 0, C7_3  }, // k25
-    { 0, C1_4  }, // k30
-    { 0, C2_4  }, // k31
-    { 0, C3_4  }, // k32
-    { 0, C5_4  }, // k33
-    { 0, C6_4  }, // k34
-    { 0, C7_4  }, // k35
-    { 0, C1_5  }, // k40
-    { 0, C2_5  }, // k41
-    { 0, C3_5  }, // k42
-    { 0, C4_5  }, // k43
-    { 0, C6_5  }, // k44
-    { 0, C7_5  }, // k45
-    { 0, C1_6  }, // k50
-    { 0, C2_6  }, // k51
-    { 0, C3_6  }, // k52
-    { 0, C4_6  }, // k53
-    { 0, C5_6  }, // k54
-    { 0, C7_6  }, // k55
+    { 0, C1_1  }, // k00 
+    { 0, C1_2  }, // k01
+    { 0, C1_3  }, // k02
+    { 0, C1_4  }, // k03
+    { 0, C1_5  }, // k04
+    { 0, C1_6  }, // k05
+    { 0, C2_1  }, // k10
+    { 0, C2_2  }, // k11
+    { 0, C2_3  }, // k12
+    { 0, C2_4  }, // k13
+    { 0, C2_5  }, // k14
+    { 0, C2_6  }, // k15
+    { 0, C3_1  }, // k20
+    { 0, C3_2  }, // k21
+    { 0, C3_3  }, // k22
+    { 0, C3_4  }, // k23
+    { 0, C3_5  }, // k24
+    { 0, C3_6  }, // k25
+    { 0, C4_1  }, // k30
+    { 0, C4_2  }, // k31
+    { 0, C4_3  }, // k32
+    { 0, C4_4  }, // k33
+    { 0, C4_5  }, // k34
+    { 0, C4_6  }, // k35
+    { 0, C5_1  }, // k40
+    { 0, C5_2  }, // k41
+    { 0, C5_3  }, // k42
+    { 0, C5_4  }, // k43
+    { 0, C5_5  }, // k44
+    { 0, C5_6  }, // k45
+    { 0, C6_1  }, // k50
+    { 0, C6_2  }, // k51
+    { 0, C6_3  }, // k52
+    { 0, C6_4  }, // k53
+    { 0, C6_5  }, // k54
+    { 0, C6_6  }, // k55
 // right half
-    { 1, C2_1  }, // k00 
-    { 1, C3_1  }, // k01
-    { 1, C4_1  }, // k02
-    { 1, C5_1  }, // k03
-    { 1, C6_1  }, // k04
-    { 1, C7_1  }, // k05
-    { 1, C1_2  }, // k10
-    { 1, C3_2  }, // k11
-    { 1, C4_2  }, // k12
-    { 1, C5_2  }, // k13
-    { 1, C6_2  }, // k14
-    { 1, C7_2  }, // k15
-    { 1, C1_3  }, // k20
-    { 1, C2_3  }, // k21
-    { 1, C4_3  }, // k22
-    { 1, C5_3  }, // k23
-    { 1, C6_3  }, // k24
-    { 1, C7_3  }, // k25
-    { 1, C1_4  }, // k30
-    { 1, C2_4  }, // k31
-    { 1, C3_4  }, // k32
-    { 1, C5_4  }, // k33
-    { 1, C6_4  }, // k34
-    { 1, C7_4  }, // k35
-    { 1, C1_5  }, // k40
-    { 1, C2_5  }, // k41
-    { 1, C3_5  }, // k42
-    { 1, C4_5  }, // k43
-    { 1, C6_5  }, // k44
-    { 1, C7_5  }, // k45
-    { 1, C1_6  }, // k50
-    { 1, C2_6  }, // k51
-    { 1, C3_6  }, // k52
-    { 1, C4_6  }, // k53
-    { 1, C5_6  }, // k54
-    { 1, C7_6  } // k55
+    { 1, C1_1  }, // k00 
+    { 1, C1_2  }, // k01
+    { 1, C1_3  }, // k02
+    { 1, C1_4  }, // k03
+    { 1, C1_5  }, // k04
+    { 1, C1_6  }, // k05
+    { 1, C2_1  }, // k10
+    { 1, C2_2  }, // k11
+    { 1, C2_3  }, // k12
+    { 1, C2_4  }, // k13
+    { 1, C2_5  }, // k14
+    { 1, C2_6  }, // k15
+    { 1, C3_1  }, // k20
+    { 1, C3_2  }, // k21
+    { 1, C3_3  }, // k22
+    { 1, C3_4  }, // k23
+    { 1, C3_5  }, // k24
+    { 1, C3_6  }, // k25
+    { 1, C4_1  }, // k30
+    { 1, C4_2  }, // k31
+    { 1, C4_3  }, // k32
+    { 1, C4_4  }, // k33
+    { 1, C4_5  }, // k34
+    { 1, C4_6  }, // k35
+    { 1, C5_1  }, // k40
+    { 1, C5_2  }, // k41
+    { 1, C5_3  }, // k42
+    { 1, C5_4  }, // k43
+    { 1, C5_5  }, // k44
+    { 1, C5_6  }, // k45
+    { 1, C6_1  }, // k50
+    { 1, C6_2  }, // k51
+    { 1, C6_3  }, // k52
+    { 1, C6_4  }, // k53
+    { 1, C6_5  }, // k54
+    { 1, C6_6  }, // k55
 };
 // Key matrix
 //    { L05, L04, L03, L02, L01, L00 },
@@ -168,3 +168,86 @@ led_config_t g_led_config = {
    }
 };
 #endif
+
+//----------------------------------------------------------------------------------------------------
+// Encoder
+//----------------------------------------------------------------------------------------------------
+bool encoder_update_kb(uint8_t index, bool clockwise) {
+    if (!encoder_update_user(index, clockwise)) {
+      return false; /* Don't process further events if user function exists and returns false */
+    }
+    switch (index) {
+        case 0:
+            if(clockwise){ 
+                tap_code_delay(KC_VOLU, 30); 
+            } else{ 
+                tap_code_delay(KC_VOLD, 30); 
+            }
+            break;
+        case 1:
+            // if (clockwise) { tap_code_delay(KC_BRIU, 10); } else { tap_code_delay(KC_BRID, 10); } 
+            if(clockwise){ 
+                tap_code_delay(KC_VOLU, 30); 
+            } else{ 
+                tap_code_delay(KC_VOLD, 30); 
+            }
+            break;
+    }
+    return true;
+}
+
+//----------------------------------------------------------------------------------------------------
+// Encoder Dip Switch
+//----------------------------------------------------------------------------------------------------
+// Both sides keep track of the slave state through this variable
+static bool dip_switch_slave_state = false;
+
+// This function is called by dip_switch_read, which is continally invoked on the master side, but has
+// to be explicitly called on the slave side
+bool dip_switch_update_kb(uint8_t index, bool active) { 
+    // If we are on the slave side, then simply update the global variable and return
+    if(!is_keyboard_master()){
+        dip_switch_slave_state = active;
+        return true;
+    }
+    
+    // Otherwise, we are on the master side. Call the user code.
+    if(!dip_switch_update_user((uint8_t)isLeftHand, active)){
+        return false;
+    } 
+        
+    // Keyboard-level behavior for the dipswitch does nothing
+    return true;
+}
+
+// This handler on the slave side gets invoked by a transaction intiated from the master's side. 
+// It just reads the slave's dip state and sends it over to the master
+void keyboard_sync_dip_slave_handler(uint8_t in_buflen, const void* in_data, uint8_t out_buflen, void* out_data){
+    dip_switch_read(false);
+    *(bool*)out_data = dip_switch_slave_state;
+}
+
+// Initialize the communication between master and slave for synchronizing the dip switch state
+void keyboard_post_init_kb(void) {
+    transaction_register_rpc(KEYBOARD_SYNC_DIP, keyboard_sync_dip_slave_handler);
+    keyboard_post_init_user();
+}
+
+// This function is periodically run. The slave dip switch state synchronization is initiated on
+// the master's side
+void housekeeping_task_kb(void) {
+    // Synchronize at most once every 100 ms
+    static uint32_t last_sync = 0;
+    if(is_keyboard_master() && timer_elapsed32(last_sync) > 100){
+        bool received_slave_state = false;
+        if(transaction_rpc_recv(KEYBOARD_SYNC_DIP, sizeof(bool), &received_slave_state)){           
+            last_sync = timer_read32();
+            // Only update the dip switch status on the master side if it's different on the slave side
+            if(dip_switch_slave_state != received_slave_state){
+                // This code is executed on the master's side, so isLeftHand needs to be negated for the slave
+                dip_switch_update_user((uint8_t)!isLeftHand, received_slave_state);
+                dip_switch_slave_state = received_slave_state;
+            }
+        }
+    }
+}
