@@ -40,9 +40,9 @@
 // Master is whichever side the usb is plugged into
 #define SPLIT_USB_DETECT
 // Maximum timeout when detecting master/slave
-#define SPLIT_USB_TIMEOUT 10000000
+//#define SPLIT_USB_TIMEOUT 1000000
 // Poll frequency when detecting master/slave
-#define SPLIT_USB_TIMEOUT_POLL 10
+//#define SPLIT_USB_TIMEOUT_POLL 10
 
 // Max time between forced master to slave sync
 //#define FORCED_SYNC_THROTTLE_MS 100
