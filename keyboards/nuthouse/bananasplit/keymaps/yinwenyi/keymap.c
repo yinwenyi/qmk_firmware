@@ -122,3 +122,9 @@ bool dip_switch_update_user(uint8_t index, bool active) {
 
    return true;
 }
+
+void keyboard_post_init_user(void) {
+  // Customise these values to desired behaviour
+  debug_enable=true;
+  debug_matrix=true;
+}
