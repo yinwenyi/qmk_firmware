@@ -40,7 +40,7 @@
 // Master is whichever side the usb is plugged into
 #define SPLIT_USB_DETECT
 // Maximum timeout when detecting master/slave
-#define SPLIT_USB_TIMEOUT 2000
+#define SPLIT_USB_TIMEOUT 50000
 // Poll frequency when detecting master/slave
 #define SPLIT_USB_TIMEOUT_POLL 10
 
@@ -48,9 +48,9 @@
 #define FORCED_SYNC_THROTTLE_MS 100
 
 // max attempts to detect slave part before assuming disconnected
-#define SPLIT_MAX_CONNECTION_ERRORS 5
+#define SPLIT_MAX_CONNECTION_ERRORS 5000
 // How long (in milliseconds) the master part should block all connection attempts to the slave after the communication has been flagged as disconnected
-#define SPLIT_CONNECTION_CHECK_TIMEOUT 500
+#define SPLIT_CONNECTION_CHECK_TIMEOUT 50
 
 // yolo
 #define SPLIT_TRANSPORT_MIRROR
