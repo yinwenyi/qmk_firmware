@@ -52,8 +52,8 @@
 // How long (in milliseconds) the master part should block all connection attempts to the slave after the communication has been flagged as disconnected
 //#define SPLIT_CONNECTION_CHECK_TIMEOUT 50
 
-// yolo
-#define SPLIT_TRANSPORT_MIRROR
+// Debug
+#define DEBUG_MATRIX_SCAN_RATE
 
 //--------------------------------------------
 // Status LED config

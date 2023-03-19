@@ -21,3 +21,6 @@ ENCODER_ENABLE = yes        # Encoder support
 DIP_SWITCH_ENABLE = yes     # Push button support
 LED_MATRIX_ENABLE = yes         # LED matrix support
 LED_MATRIX_DRIVER = IS31FL3731  # bless!! Native qmk support for this IC
+# Attempt to save space
+LTO_ENABLE = yes
+MUSIC_ENABLE = no
