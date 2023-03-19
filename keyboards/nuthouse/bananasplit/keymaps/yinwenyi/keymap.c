@@ -72,31 +72,47 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 
 
-// encoder mapping
-// TODO how to tell which encoder is the first one???
+// Mapped to volume and backlight brightness controls
 bool encoder_update_user(uint8_t index, bool clockwise) {
     switch (index) {
         case 0:
-            if (clockwise) { tap_code_delay(KC_VOLU, 10); } else { tap_code_delay(KC_VOLD, 10); }
+            if (clockwise) {
+                tap_code_delay(KC_VOLU, 10);
+            } else {
+                tap_code_delay(KC_VOLD, 10);
+            }
             break;
         case 1:
-            if (clockwise) { tap_code_delay(KC_BRIU, 10); } else { tap_code_delay(KC_BRID, 10); } 
+            if (clockwise) {
+                register_code16(BL_UP);
+            } else {
+                register_code16(BL_DOWN);
+            } 
             break;
     }
     return false;
 }
 
-// Push button on encoder
+// The default behavior for the encoder dip switch does notion. The keyboard has setup the dip switch
+// such that index = 0 is the right side and index = 1 is the left side
 bool dip_switch_update_user(uint8_t index, bool active) { 
-    switch (index) {
-        case 0:
+   switch(index){
+      // Right side
+      case 0:{
+         if(active){
             register_code(KC_MUTE);
-            break;
-        case 1:
-            register_code(KC_MUTE);
-            break;
-    }
-    return true;
+         } else{
+            unregister_code(KC_MUTE);
+         }
+         break;
+      }
+      // Left side
+      case 1:{
+        register_code16(BL_TOGG);
+     }
+   }
+
+   return true;
 }
 
 // Caps lock
@@ -114,5 +130,3 @@ bool led_update_user(led_t led_state) {
     }
     return true;
 }
-
-
