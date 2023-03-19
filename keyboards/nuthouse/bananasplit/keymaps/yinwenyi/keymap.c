@@ -84,9 +84,11 @@ bool encoder_update_user(uint8_t index, bool clockwise) {
             break;
         case 1:
             if (clockwise) {
-                register_code16(BL_UP);
+//                register_code16(BL_UP);
+                tap_code_delay(KC_VOLU, 10);
             } else {
-                register_code16(BL_DOWN);
+//                register_code16(BL_DOWN);
+                tap_code_delay(KC_VOLD, 10);
             } 
             break;
     }
@@ -108,7 +110,13 @@ bool dip_switch_update_user(uint8_t index, bool active) {
       }
       // Left side
       case 1:{
-        register_code16(BL_TOGG);
+//        register_code16(BL_TOGG);
+          if(active){
+             register_code(KC_CAPS);
+          } else{
+             unregister_code(KC_CAPS);
+          }
+          break;
      }
    }
 

@@ -88,16 +88,16 @@
 //--------------------------------------------
 // Backlight LED matrix config
 //--------------------------------------------
-#define LED_DRIVER_COUNT 2
-#define LED_DRIVER_ADDR_1 0b1110100
-#define LED_DRIVER_ADDR_2 0b1110111
-#define LED_DRIVER_1_LED_TOTAL 36
-#define LED_DRIVER_2_LED_TOTAL 36
-#define LED_MATRIX_LED_COUNT (LED_DRIVER_1_LED_TOTAL + LED_DRIVER_2_LED_TOTAL)
-#define LED_MATRIX_SPLIT { 36, 36 }
-// Turn down the brightness
-#define LED_BRIGHTNESS_LO 100
-#define LED_MATRIX_DEFAULT_VAL LED_BRIGHTNESS_LO
-#define ENABLE_LED_MATRIX_BAND
-
-#define LED_DISABLE_WHEN_USB_SUSPENDED
+//#define LED_DRIVER_COUNT 2
+//#define LED_DRIVER_ADDR_1 0b1110100
+//#define LED_DRIVER_ADDR_2 0b1110111
+//#define LED_DRIVER_1_LED_TOTAL 36
+//#define LED_DRIVER_2_LED_TOTAL 36
+//#define LED_MATRIX_LED_COUNT (LED_DRIVER_1_LED_TOTAL + LED_DRIVER_2_LED_TOTAL)
+//#define LED_MATRIX_SPLIT { 36, 36 }
+//// Turn down the brightness
+//#define LED_BRIGHTNESS_LO 100
+//#define LED_MATRIX_DEFAULT_VAL LED_BRIGHTNESS_LO
+//#define ENABLE_LED_MATRIX_BAND
+//
+//#define LED_DISABLE_WHEN_USB_SUSPENDED
