@@ -122,19 +122,3 @@ bool dip_switch_update_user(uint8_t index, bool active) {
 
    return true;
 }
-
-// Caps lock
-// Initialize the LED at keyboard startup
-void keyboard_post_init_user(void) {
-    rgblight_disable();
-    if (host_keyboard_led_state().caps_lock) {
-        rgblight_enable();
-    }
-}
-bool led_update_user(led_t led_state) {
-    // toggle if current state of led and caps lock are different
-    if (led_state.caps_lock != rgblight_is_enabled()) {
-        rgblight_toggle();
-    }
-    return true;
-}

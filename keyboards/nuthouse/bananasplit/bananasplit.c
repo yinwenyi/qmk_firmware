@@ -172,10 +172,15 @@ void keyboard_sync_dip_slave_handler(uint8_t in_buflen, const void* in_data, uin
     *(bool*)out_data = dip_switch_slave_state;
 }
 
-// Initialize the communication between master and slave for synchronizing the dip switch state
 void keyboard_post_init_kb(void) {
+    // Initialize the communication between master and slave for synchronizing the dip switch state
     transaction_register_rpc(KEYBOARD_SYNC_DIP, keyboard_sync_dip_slave_handler);
     keyboard_post_init_user();
+    // Initialize the caps lock LED at keyboard startup
+    rgblight_disable();
+    if(host_keyboard_led_state().caps_lock) {
+        rgblight_enable();
+    }
 }
 
 // This function is periodically run. The slave dip switch state synchronization is initiated on
@@ -195,4 +200,16 @@ void housekeeping_task_kb(void) {
             }
         }
     }
+}
+
+// Caps lock LED handling
+bool led_update_kb(led_t led_state) {
+    bool run = led_update_user(led_state);
+    if(run) {
+        // toggle if current state of led and caps lock are different
+        if(led_state.caps_lock != rgblight_is_enabled()) {
+            rgblight_toggle();
+        }
+    }
+    return run;
 }
