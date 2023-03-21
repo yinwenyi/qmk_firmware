@@ -16,6 +16,9 @@
 
 #include "bananasplit.h"
 
+//----------------------------------------------------------------------------------------------------
+// LED Matrix
+//----------------------------------------------------------------------------------------------------
 #ifdef LED_MATRIX_ENABLE 
 const is31_led PROGMEM g_is31_leds[LED_MATRIX_LED_COUNT] = {
 /* Refer to IS31 manual for these locations
@@ -112,6 +115,42 @@ led_config_t g_led_config = {
         4, 4, 4, 4, 4, 4
    }
 };
+
+// Custom driver that only initiates i2c transactions from the master side
+static void init(void) {
+    // Turn on the LED drivers
+    setPinOutput(D4);
+    writePinHigh(D4);
+
+    // Delay is necessary for both sides to be initialized to the point that GPIO can be toggled
+    wait_ms(3000);
+
+    if(is_keyboard_master()){
+        // Based on led_matrix_drivers.c
+        i2c_init();
+        IS31FL3731_init(LED_DRIVER_ADDR_1);
+        IS31FL3731_init(LED_DRIVER_ADDR_2);
+        for (int index = 0; index < LED_MATRIX_LED_COUNT; index++) {
+            IS31FL3731_set_led_control_register(index, true);
+        }
+        IS31FL3731_update_led_control_registers(LED_DRIVER_ADDR_1, 0);
+        IS31FL3731_update_led_control_registers(LED_DRIVER_ADDR_2, 1);
+    }
+}
+
+static void flush(void) {
+    if(is_keyboard_master()){
+        IS31FL3731_update_pwm_buffers(LED_DRIVER_ADDR_1, 0);
+        IS31FL3731_update_pwm_buffers(LED_DRIVER_ADDR_2, 1);
+    }
+}
+
+const led_matrix_driver_t led_matrix_driver = {
+    .init          = init,
+    .flush         = flush,
+    .set_value     = IS31FL3731_set_value,
+    .set_value_all = IS31FL3731_set_value_all,
+};
 #endif
 
 //----------------------------------------------------------------------------------------------------
@@ -119,18 +158,22 @@ led_config_t g_led_config = {
 //----------------------------------------------------------------------------------------------------
 bool encoder_update_kb(uint8_t index, bool clockwise) {
     if (!encoder_update_user(index, clockwise)) {
-      return false; /* Don't process further events if user function exists and returns false */
+      return false;
     }
     switch (index) {
+        // Left side
         case 0:
             if(clockwise){ 
-                tap_code_delay(KC_VOLU, 30); 
+                // TODO: the backlight changes very slowly when the left side is also the master.
+                // I have a feeling that encoder_update_kb isn't called as often due to the cpu 
+                // being overloaded by the led matrix effects
+                led_matrix_increase_val_noeeprom();
             } else{ 
-                tap_code_delay(KC_VOLD, 30); 
+                led_matrix_decrease_val_noeeprom();
             }
             break;
+        // Right side
         case 1:
-            // if (clockwise) { tap_code_delay(KC_BRIU, 10); } else { tap_code_delay(KC_BRID, 10); } 
             if(clockwise){ 
                 tap_code_delay(KC_VOLU, 30); 
             } else{ 
@@ -172,6 +215,10 @@ void keyboard_sync_dip_slave_handler(uint8_t in_buflen, const void* in_data, uin
     *(bool*)out_data = dip_switch_slave_state;
 }
 
+void keyboard_pre_init_kb(void){
+    keyboard_pre_init_user();
+}
+
 void keyboard_post_init_kb(void) {
     // Initialize the communication between master and slave for synchronizing the dip switch state
     transaction_register_rpc(KEYBOARD_SYNC_DIP, keyboard_sync_dip_slave_handler);
@@ -180,6 +227,7 @@ void keyboard_post_init_kb(void) {
     if(host_keyboard_led_state().caps_lock) {
         rgblight_enable();
     }
+    // User logic
     keyboard_post_init_user();
 }
 
@@ -202,7 +250,9 @@ void housekeeping_task_kb(void) {
     }
 }
 
+//----------------------------------------------------------------------------------------------------
 // Caps lock LED handling
+//----------------------------------------------------------------------------------------------------
 bool led_update_kb(led_t led_state) {
     bool run = led_update_user(led_state);
     if(run) {

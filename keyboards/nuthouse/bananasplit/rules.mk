@@ -20,7 +20,10 @@ AUDIO_ENABLE = no           # Audio output
 ENCODER_ENABLE = yes        # Encoder support
 DIP_SWITCH_ENABLE = yes     # Push button support
 LED_MATRIX_ENABLE = yes         # LED matrix support
-LED_MATRIX_DRIVER = IS31FL3731  # bless!! Native qmk support for this IC
+LED_MATRIX_DRIVER = custom  # bless!! Native qmk support for this IC
+COMMON_VPATH += $(DRIVER_PATH)/issi
+SRC +=  drivers/led/issi/is31fl3731-simple.c
+QUANTUM_LIB_SRC += i2c_master.c
 # Attempt to save space
 LTO_ENABLE = yes
 MUSIC_ENABLE = no
