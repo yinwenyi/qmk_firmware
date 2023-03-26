@@ -118,10 +118,6 @@ led_config_t g_led_config = {
 
 // Custom driver that only initiates i2c transactions from the master side
 static void init(void) {
-    // Turn on the LED drivers
-    setPinOutput(D4);
-    writePinHigh(D4);
-
     // Delay is necessary for both sides to be initialized to the point that GPIO can be toggled
     wait_ms(3000);
 
@@ -156,31 +152,49 @@ const led_matrix_driver_t led_matrix_driver = {
 //----------------------------------------------------------------------------------------------------
 // Encoder
 //----------------------------------------------------------------------------------------------------
+static int previous_knob_state = 0;
+static int knob_state = 0;
+static uint8_t encoder_state = 0;
+static uint8_t last_pin_a = 1;
+
+ISR(PCINT0_vect){
+    const uint8_t pin_a = readPin(ENCODER_RIGHT_PAD_A);
+    if(pin_a != last_pin_a){
+        if(readPin(ENCODER_RIGHT_PAD_B) != pin_a){
+            encoder_state = (encoder_state + 1) % (2 * ENCODER_DETENTS);
+        }else{
+            encoder_state = (encoder_state + 2 * ENCODER_DETENTS - 1) % (2 * ENCODER_DETENTS);
+        }
+        knob_state = encoder_state / 2;
+    }
+    last_pin_a = pin_a;
+}
+
 bool encoder_update_kb(uint8_t index, bool clockwise) {
-    if (!encoder_update_user(index, clockwise)) {
-      return false;
-    }
-    switch (index) {
-        // Left side
-        case 0:
-            if(clockwise){ 
-                // TODO: the backlight changes very slowly when the left side is also the master.
-                // I have a feeling that encoder_update_kb isn't called as often due to the cpu 
-                // being overloaded by the led matrix effects
-                led_matrix_increase_val_noeeprom();
-            } else{ 
-                led_matrix_decrease_val_noeeprom();
-            }
-            break;
-        // Right side
-        case 1:
-            if(clockwise){ 
-                tap_code_delay(KC_VOLU, 30); 
-            } else{ 
-                tap_code_delay(KC_VOLD, 30); 
-            }
-            break;
-    }
+    // if (!encoder_update_user(index, clockwise)) {
+    //   return false;
+    // }
+    // switch (index) {
+    //     // Left side
+    //     case 0:
+    //         if(clockwise){ 
+    //             // TODO: the backlight changes very slowly when the left side is also the master.
+    //             // I have a feeling that encoder_update_kb isn't called as often due to the cpu 
+    //             // being overloaded by the led matrix effects
+    //             led_matrix_increase_val_noeeprom();
+    //         } else{ 
+    //             led_matrix_decrease_val_noeeprom();
+    //         }
+    //         break;
+    //     // Right side
+    //     case 1:
+    //         if(clockwise){ 
+    //             tap_code_delay(KC_VOLU, 30); 
+    //         } else{ 
+    //             tap_code_delay(KC_VOLD, 30); 
+    //         }
+    //         break;
+    // }
     return true;
 }
 
@@ -216,8 +230,22 @@ void keyboard_sync_dip_slave_handler(uint8_t in_buflen, const void* in_data, uin
 }
 
 void keyboard_pre_init_kb(void){
+    // Turn on the LED drivers
+    setPinOutput(D4);
+    writePinHigh(D4);
+    
+    // Turn on encoder pins and configure them as interrupt inputs
+    setPinInputHigh(B0);
+    setPinInputHigh(B7);
+    PCMSK0 |= 0b10000001;
+    PCICR |= 0b00000001;
+
     keyboard_pre_init_user();
 }
+
+
+
+
 
 void keyboard_post_init_kb(void) {
     // Initialize the communication between master and slave for synchronizing the dip switch state
@@ -228,6 +256,8 @@ void keyboard_post_init_kb(void) {
         rgblight_enable();
     }
     // User logic
+    debug_enable = true;
+    debug_matrix = true;
     keyboard_post_init_user();
 }
 
@@ -246,6 +276,27 @@ void housekeeping_task_kb(void) {
                 dip_switch_update_user((uint8_t)!isLeftHand, received_slave_state);
                 dip_switch_slave_state = received_slave_state;
             }
+        }
+
+        // Encoder state
+        if(knob_state != previous_knob_state){
+            // led_matrix_set_value_all(encoder_state * 10);
+            const int difference = knob_state - previous_knob_state;
+            if(difference > 0){
+                // tap_code_delay(KC_VOLU, difference * 10);
+                // for(int i = 0; i < difference; ++i){
+                //     tap_code(KC_VOLU);
+                // }
+
+            } else{
+                // tap_code_delay(KC_VOLU, -difference * 10);
+                // for(int i = 0; i < -difference; ++i){
+                //     tap_code(KC_VOLD);
+                // }
+            }
+            previous_knob_state = knob_state;
+
+            dprintf("encoder: %d\n", knob_state);
         }
     }
 }

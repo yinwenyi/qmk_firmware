@@ -81,6 +81,11 @@
 // Schematic part has 24 pulses per full rotation
 #define ENCODER_RESOLUTION 4
 
+
+#define ENCODER_RIGHT_PAD_A B7
+#define ENCODER_RIGHT_PAD_B B0
+#define ENCODER_DETENTS 24
+
 // Push button pin
 #define DIP_SWITCH_PINS_RIGHT { E6 }
 #define DIP_SWITCH_PINS { E6 }
