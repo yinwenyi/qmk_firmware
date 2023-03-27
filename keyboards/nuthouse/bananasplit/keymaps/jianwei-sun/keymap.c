@@ -58,3 +58,29 @@ bool dip_switch_update_user(uint8_t index, bool active) {
 
    return true;
 }
+
+bool encoder_update_user(uint8_t index, bool clockwise) {
+    switch(index){
+        // Right side
+        case 0:{
+            if(clockwise){
+                tap_code(KC_VOLU);
+                tap_code(KC_VOLU);
+            } else{
+                tap_code(KC_VOLD);
+                tap_code(KC_VOLD);
+            }
+            break;
+        }
+        // Left side
+        case 1:{
+            if(clockwise){
+                led_matrix_increase_val_noeeprom();
+            } else{
+                led_matrix_decrease_val_noeeprom();
+            }
+            break;
+        }
+    }
+    return true;
+}

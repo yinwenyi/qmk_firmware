@@ -67,7 +67,7 @@
 #define RGBLIGHT_LIMIT_VAL 64
 
 //--------------------------------------------
-// Encoder config
+// Encoder and dip switch config
 //--------------------------------------------
 // Encoder hardware
 #define ENCODER_RIGHT_PAD_A B7
@@ -81,6 +81,9 @@
 // For split dip switch
 #define SPLIT_TRANSACTION_IDS_KB KEYBOARD_SYNC_DIP
 
+// Synchronization min period
+#define SLAVE_HANDLER_MIN_PERIOD_MS 50
+
 //--------------------------------------------
 // Backlight LED matrix config
 //--------------------------------------------
@@ -91,6 +94,8 @@
 #define LED_DRIVER_1_LED_TOTAL 36
 #define LED_DRIVER_2_LED_TOTAL 36
 #define LED_MATRIX_LED_COUNT (LED_DRIVER_1_LED_TOTAL + LED_DRIVER_2_LED_TOTAL)
+// Step size for each led matrix increase or decrease call. Range is 0-255
+#define LED_MATRIX_VAL_STEP 24
 
 // #define LED_MATRIX_SPLIT { 36, 36 }
 // #define SPLIT_TRANSPORT_MIRROR
