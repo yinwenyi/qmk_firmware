@@ -29,7 +29,8 @@
 // Optional debounce
 #define DEBOUNCE 5
 
-#define USE_I2C
+// Debug
+// #define DEBUG_MATRIX_SCAN_RATE
 
 //--------------------------------------------
 // Split config
@@ -43,17 +44,14 @@
 #define SPLIT_USB_TIMEOUT 2000
 // Poll frequency when detecting master/slave
 #define SPLIT_USB_TIMEOUT_POLL 10
-
 // Max time between forced master to slave sync
 #define FORCED_SYNC_THROTTLE_MS 100
-
+// Communcation interface between master and slave
+#define USE_I2C
 // max attempts to detect slave part before assuming disconnected
 #define SPLIT_MAX_CONNECTION_ERRORS 5
 // How long (in milliseconds) the master part should block all connection attempts to the slave after the communication has been flagged as disconnected
 #define SPLIT_CONNECTION_CHECK_TIMEOUT 500
-
-// Debug
-// #define DEBUG_MATRIX_SCAN_RATE
 
 //--------------------------------------------
 // Status LED config
@@ -69,17 +67,12 @@
 #define RGBLIGHT_LIMIT_VAL 64
 
 //--------------------------------------------
-// Encoder config
+// Encoder and dip switch config
 //--------------------------------------------
-#define ENCODERS_PAD_A_RIGHT { B7 }
-#define ENCODERS_PAD_B_RIGHT { B0 }
-// Order is switched for the left side
-#define ENCODERS_PAD_A { B0 }
-#define ENCODERS_PAD_B { B7 }
-
-// How many pulses the encoder registers between each detent
-// Schematic part has 24 pulses per full rotation
-#define ENCODER_RESOLUTION 4
+// Encoder hardware
+#define ENCODER_RIGHT_PAD_A B7
+#define ENCODER_RIGHT_PAD_B B0
+#define ENCODER_DETENTS 24
 
 // Push button pin
 #define DIP_SWITCH_PINS_RIGHT { E6 }
@@ -88,15 +81,21 @@
 // For split dip switch
 #define SPLIT_TRANSACTION_IDS_KB KEYBOARD_SYNC_DIP
 
+// Synchronization min period
+#define SLAVE_HANDLER_MIN_PERIOD_MS 50
+
 //--------------------------------------------
 // Backlight LED matrix config
 //--------------------------------------------
+#define LED_DRIVER_ENABLE_PIN D4
 #define LED_DRIVER_COUNT 2
 #define LED_DRIVER_ADDR_1 0b1110100
 #define LED_DRIVER_ADDR_2 0b1110111
 #define LED_DRIVER_1_LED_TOTAL 36
 #define LED_DRIVER_2_LED_TOTAL 36
 #define LED_MATRIX_LED_COUNT (LED_DRIVER_1_LED_TOTAL + LED_DRIVER_2_LED_TOTAL)
+// Step size for each led matrix increase or decrease call. Range is 0-255
+#define LED_MATRIX_VAL_STEP 24
 
 // #define LED_MATRIX_SPLIT { 36, 36 }
 // #define SPLIT_TRANSPORT_MIRROR

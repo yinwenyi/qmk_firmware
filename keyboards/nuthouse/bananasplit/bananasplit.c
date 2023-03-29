@@ -17,6 +17,177 @@
 #include "bananasplit.h"
 
 //----------------------------------------------------------------------------------------------------
+// Initialization
+//----------------------------------------------------------------------------------------------------
+void keyboard_pre_init_kb(void){
+    // Turn on the LED drivers
+    setPinOutput(LED_DRIVER_ENABLE_PIN);
+    writePinHigh(LED_DRIVER_ENABLE_PIN);
+    
+    // Configure encoder pins' direction
+    setPinInputHigh(ENCODER_RIGHT_PAD_A);
+    setPinInputHigh(ENCODER_RIGHT_PAD_B);
+
+    // Configure the encoder pins as interrupt inputs
+    PCMSK0 |= (0x1 << (ENCODER_RIGHT_PAD_A & 0b00001111)) | (0x1 << (ENCODER_RIGHT_PAD_B & 0b00001111));
+    PCICR |= 0b00000001;
+
+    // User logic
+    keyboard_pre_init_user();
+}
+
+// Declaration for the custom slave function. Necessary for synchronization encoder and dip switch state
+void keyboard_sync_slave_handler(uint8_t in_buflen, const void* in_data, uint8_t out_buflen, void* out_data);
+
+void keyboard_post_init_kb(void) {
+    // Initialize the communication between master and slave for synchronizing the dip switch state
+    transaction_register_rpc(KEYBOARD_SYNC_DIP, keyboard_sync_slave_handler);
+
+    // Initialize the caps lock LED at keyboard startup
+    rgblight_disable();
+    if(host_keyboard_led_state().caps_lock) {
+        rgblight_enable();
+    }
+
+    // User logic
+    keyboard_post_init_user();
+}
+
+//----------------------------------------------------------------------------------------------------
+// Rotary Encoder
+//----------------------------------------------------------------------------------------------------
+// Processed encoder values
+static int previous_knob_state = 0;
+static uint8_t knob_state = 0;
+static uint8_t slave_knob_state = 0;
+
+// States for keeping track of encoder pulses
+static uint8_t encoder_state = 0;
+static uint8_t last_pin_a = 1;
+
+ISR(PCINT0_vect){
+    const uint8_t pin_a = readPin(ENCODER_RIGHT_PAD_A);
+    if(pin_a != last_pin_a){
+        // The condition for increasing encoder count is flipped on the left side
+        const bool decreasing = (readPin(ENCODER_RIGHT_PAD_B) != pin_a) == isLeftHand;
+        if(decreasing){
+            // Cannot subtract from unsigned due to underflow, so just do modulo subtraction
+            encoder_state = (encoder_state + 2 * ENCODER_DETENTS - 1) % (2 * ENCODER_DETENTS);
+        } else{
+            // Two pulses correspond to one detent, so 2 * ENCODER_DETENTS is needed
+            encoder_state = (encoder_state + 1) % (2 * ENCODER_DETENTS);
+        }
+        // Decreasing is needed to prevent a half turn in the negative direction from registering
+        // as a full one. This is caused by the LSB getting thrown out with the division
+        knob_state = ((encoder_state + (uint8_t)decreasing) % (2 * ENCODER_DETENTS)) / 2;
+    }
+    last_pin_a = pin_a;
+}
+
+// Check whether the encoder is rotation clockwise by computing the difference between the two unsigned values.
+// The difference also takes care of the wrap-around at ENCODER_DETENTS
+bool encoder_clockwise(uint8_t new_value, uint8_t old_value){
+    const uint8_t delta_value = new_value > old_value ? new_value - old_value : old_value - new_value;
+    const int8_t difference = (int8_t)(delta_value > ENCODER_DETENTS / 2 ? ENCODER_DETENTS - delta_value + 1 : delta_value)
+        * ((delta_value > ENCODER_DETENTS / 2) == (new_value > old_value) ? -1 : 1);
+    return difference > 0;
+}
+
+// Default implementation for a user-provided encoder update function
+__attribute__((weak)) bool encoder_update_user(uint8_t index, bool clockwise) {
+    return true;
+}
+
+// Requires the user to implement functionality
+bool encoder_update_kb(uint8_t index, bool clockwise) {
+    return encoder_update_user(index, clockwise);
+}
+
+//----------------------------------------------------------------------------------------------------
+// Encoder Dip Switch
+//----------------------------------------------------------------------------------------------------
+// Both sides keep track of the slave state through this variable
+static bool dip_switch_slave_state = false;
+
+// This function is called by dip_switch_read, which is continally invoked on the master side, but has
+// to be explicitly called on the slave side
+bool dip_switch_update_kb(uint8_t index, bool active) { 
+    // If we are on the slave side, then simply update the global variable and return
+    if(!is_keyboard_master()){
+        dip_switch_slave_state = active;
+        return true;
+    }
+    
+    // Otherwise, we are on the master side. Call the user code.
+    if(!dip_switch_update_user((uint8_t)isLeftHand, active)){
+        return false;
+    } 
+        
+    // Keyboard-level behavior for the dipswitch does nothing
+    return true;
+}
+
+//----------------------------------------------------------------------------------------------------
+// Synchronization for Encoder and Dip Switch
+//----------------------------------------------------------------------------------------------------
+// This handler on the slave side gets invoked by a transaction intiated from the master's side. 
+// It just reads the slave's dip state and sends it over along with the encoder value to the master
+void keyboard_sync_slave_handler(uint8_t in_buflen, const void* in_data, uint8_t out_buflen, void* out_data){
+    dip_switch_read(false);
+    // Pack the dip switch state with the encoder value to save on time
+    *(uint8_t*)out_data = knob_state | ((uint8_t)dip_switch_slave_state << 7);
+}
+
+// This function is periodically run. The slave dip switch state synchronization is initiated on
+// the master's side
+void housekeeping_task_kb(void) {
+    // Update at most once every SLAVE_HANDLER_MIN_PERIOD_MS
+    static uint32_t last_sync = 0;
+    if(is_keyboard_master() && timer_elapsed32(last_sync) > SLAVE_HANDLER_MIN_PERIOD_MS){
+        last_sync = timer_read32();
+
+        // Receive encoder and dip switch information from the slave side
+        uint8_t receive_buffer = 0;
+        if(transaction_rpc_recv(KEYBOARD_SYNC_DIP, sizeof(uint8_t), &receive_buffer)){           
+            // Only update the dip switch status on the master side if it's different on the slave side
+            const bool received_slave_dip_state = (receive_buffer & 0b10000000) != 0;
+            if(dip_switch_slave_state != received_slave_dip_state){
+                // This code is executed on the master's side, so isLeftHand needs to be negated for the slave
+                dip_switch_update_user((uint8_t)!isLeftHand, received_slave_dip_state);
+                dip_switch_slave_state = received_slave_dip_state;
+            }
+
+            // Process the slave's encoder change
+            const uint8_t received_slave_knob_state = (receive_buffer & 0b01111111);
+            if(received_slave_knob_state != slave_knob_state){
+                encoder_update_kb((uint8_t)!isLeftHand, encoder_clockwise(received_slave_knob_state, slave_knob_state));
+                slave_knob_state = received_slave_knob_state;
+            }
+        }
+
+        // Process the master's encoder change
+        if(knob_state != previous_knob_state){
+            encoder_update_kb((uint8_t)isLeftHand, encoder_clockwise(knob_state, previous_knob_state));
+            previous_knob_state = knob_state;
+        }
+    }
+}
+
+//----------------------------------------------------------------------------------------------------
+// Caps lock LED handling
+//----------------------------------------------------------------------------------------------------
+bool led_update_kb(led_t led_state) {
+    bool run = led_update_user(led_state);
+    if(run) {
+        // toggle if current state of led and caps lock are different
+        if(led_state.caps_lock != rgblight_is_enabled()) {
+            rgblight_toggle();
+        }
+    }
+    return run;
+}
+
+//----------------------------------------------------------------------------------------------------
 // LED Matrix
 //----------------------------------------------------------------------------------------------------
 #ifdef LED_MATRIX_ENABLE 
@@ -118,10 +289,6 @@ led_config_t g_led_config = {
 
 // Custom driver that only initiates i2c transactions from the master side
 static void init(void) {
-    // Turn on the LED drivers
-    setPinOutput(D4);
-    writePinHigh(D4);
-
     // Delay is necessary for both sides to be initialized to the point that GPIO can be toggled
     wait_ms(3000);
 
@@ -152,114 +319,3 @@ const led_matrix_driver_t led_matrix_driver = {
     .set_value_all = IS31FL3731_set_value_all,
 };
 #endif
-
-//----------------------------------------------------------------------------------------------------
-// Encoder
-//----------------------------------------------------------------------------------------------------
-bool encoder_update_kb(uint8_t index, bool clockwise) {
-    if (!encoder_update_user(index, clockwise)) {
-      return false;
-    }
-    switch (index) {
-        // Left side
-        case 0:
-            if(clockwise){ 
-                // TODO: the backlight changes very slowly when the left side is also the master.
-                // I have a feeling that encoder_update_kb isn't called as often due to the cpu 
-                // being overloaded by the led matrix effects
-                led_matrix_increase_val_noeeprom();
-            } else{ 
-                led_matrix_decrease_val_noeeprom();
-            }
-            break;
-        // Right side
-        case 1:
-            if(clockwise){ 
-                tap_code_delay(KC_VOLU, 30); 
-            } else{ 
-                tap_code_delay(KC_VOLD, 30); 
-            }
-            break;
-    }
-    return true;
-}
-
-//----------------------------------------------------------------------------------------------------
-// Encoder Dip Switch
-//----------------------------------------------------------------------------------------------------
-// Both sides keep track of the slave state through this variable
-static bool dip_switch_slave_state = false;
-
-// This function is called by dip_switch_read, which is continally invoked on the master side, but has
-// to be explicitly called on the slave side
-bool dip_switch_update_kb(uint8_t index, bool active) { 
-    // If we are on the slave side, then simply update the global variable and return
-    if(!is_keyboard_master()){
-        dip_switch_slave_state = active;
-        return true;
-    }
-    
-    // Otherwise, we are on the master side. Call the user code.
-    if(!dip_switch_update_user((uint8_t)isLeftHand, active)){
-        return false;
-    } 
-        
-    // Keyboard-level behavior for the dipswitch does nothing
-    return true;
-}
-
-// This handler on the slave side gets invoked by a transaction intiated from the master's side. 
-// It just reads the slave's dip state and sends it over to the master
-void keyboard_sync_dip_slave_handler(uint8_t in_buflen, const void* in_data, uint8_t out_buflen, void* out_data){
-    dip_switch_read(false);
-    *(bool*)out_data = dip_switch_slave_state;
-}
-
-void keyboard_pre_init_kb(void){
-    keyboard_pre_init_user();
-}
-
-void keyboard_post_init_kb(void) {
-    // Initialize the communication between master and slave for synchronizing the dip switch state
-    transaction_register_rpc(KEYBOARD_SYNC_DIP, keyboard_sync_dip_slave_handler);
-    // Initialize the caps lock LED at keyboard startup
-    rgblight_disable();
-    if(host_keyboard_led_state().caps_lock) {
-        rgblight_enable();
-    }
-    // User logic
-    keyboard_post_init_user();
-}
-
-// This function is periodically run. The slave dip switch state synchronization is initiated on
-// the master's side
-void housekeeping_task_kb(void) {
-    // Synchronize at most once every 100 ms
-    static uint32_t last_sync = 0;
-    if(is_keyboard_master() && timer_elapsed32(last_sync) > 100){
-        bool received_slave_state = false;
-        if(transaction_rpc_recv(KEYBOARD_SYNC_DIP, sizeof(bool), &received_slave_state)){           
-            last_sync = timer_read32();
-            // Only update the dip switch status on the master side if it's different on the slave side
-            if(dip_switch_slave_state != received_slave_state){
-                // This code is executed on the master's side, so isLeftHand needs to be negated for the slave
-                dip_switch_update_user((uint8_t)!isLeftHand, received_slave_state);
-                dip_switch_slave_state = received_slave_state;
-            }
-        }
-    }
-}
-
-//----------------------------------------------------------------------------------------------------
-// Caps lock LED handling
-//----------------------------------------------------------------------------------------------------
-bool led_update_kb(led_t led_state) {
-    bool run = led_update_user(led_state);
-    if(run) {
-        // toggle if current state of led and caps lock are different
-        if(led_state.caps_lock != rgblight_is_enabled()) {
-            rgblight_toggle();
-        }
-    }
-    return run;
-}
