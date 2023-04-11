@@ -37,7 +37,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //├────────┼────────┼────────┤├────────┼────────┼────────┼────────┼────────┼────────┤                          ├────────┼────────┼────────┼────────┼────────┼────────┤├────────┼────────┼────────┤
      KC_LCTL, KC_LGUI, KC_LALT,   KC_LSFT, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,                               KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_RSFT,  KC_LEFT, KC_DOWN, KC_RIGHT,
   //└────────┴────────┴────────┘└────────┴────────┼────────┼────────┼────────┼────────┼────────┐        ┌────────┼────────┼────────┼────────┴────────┴────────┴────────┘└────────┴────────┴────────┘
-                                                                               KC_COPY, KC_SPC,           KC_ENT,  KC_PSTE
+                                                                               KC_LSFT, KC_SPC,           KC_ENT,  KC_RSFT
   //                                                                         └────────┴────────┘        └────────┴────────┘
   )
 
@@ -72,27 +72,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 
 
-// Mapped to volume and backlight brightness controls
-bool encoder_update_user(uint8_t index, bool clockwise) {
-    switch (index) {
-        case 0:
-            if (clockwise) {
-                tap_code_delay(KC_VOLU, 10);
-            } else {
-                tap_code_delay(KC_VOLD, 10);
-            }
-            break;
-        case 1:
-            if (clockwise) {
-//                register_code16(BL_UP);
-                tap_code_delay(KC_VOLU, 10);
-            } else {
-//                register_code16(BL_DOWN);
-                tap_code_delay(KC_VOLD, 10);
-            } 
-            break;
-    }
-    return false;
+void keyboard_post_init_user(void) {
+  // Customise these values to desired behaviour
+  debug_enable=true;
+  debug_matrix=true;
 }
 
 // The default behavior for the encoder dip switch does notion. The keyboard has setup the dip switch
@@ -102,29 +85,44 @@ bool dip_switch_update_user(uint8_t index, bool active) {
       // Right side
       case 0:{
          if(active){
-            register_code(KC_MUTE);
-         } else{
-            unregister_code(KC_MUTE);
+            tap_code(KC_MUTE);
          }
          break;
       }
       // Left side
       case 1:{
-//        register_code16(BL_TOGG);
-          if(active){
-             register_code(KC_CAPS);
-          } else{
-             unregister_code(KC_CAPS);
-          }
-          break;
-     }
+         if(active){
+            led_matrix_toggle_noeeprom();
+         }
+         break;
+      }
    }
 
    return true;
 }
 
-void keyboard_post_init_user(void) {
-  // Customise these values to desired behaviour
-  debug_enable=true;
-  debug_matrix=true;
+bool encoder_update_user(uint8_t index, bool clockwise) {
+    switch(index){
+        // Right side
+        case 0:{
+            if(clockwise){
+                tap_code(KC_VOLU);
+                tap_code(KC_VOLU);
+            } else{
+                tap_code(KC_VOLD);
+                tap_code(KC_VOLD);
+            }
+            break;
+        }
+        // Left side
+        case 1:{
+            if(clockwise){
+                led_matrix_increase_val_noeeprom();
+            } else{
+                led_matrix_decrease_val_noeeprom();
+            }
+            break;
+        }
+    }
+    return true;
 }

@@ -44,6 +44,7 @@ void keyboard_post_init_kb(void) {
     transaction_register_rpc(KEYBOARD_SYNC_DIP, keyboard_sync_slave_handler);
 
     // Initialize the caps lock LED at keyboard startup
+    rgblight_mode(RGBLIGHT_MODE_RAINBOW_MOOD);
     rgblight_disable();
     if(host_keyboard_led_state().caps_lock) {
         rgblight_enable();

@@ -61,10 +61,11 @@
 #define RGBLED_SPLIT {1, 1}
 #define RGBLIGHT_SLEEP
 #define RGBLIGHT_SPLIT
-// Try yellow
-#define RGBLIGHT_DEFAULT_HUE 43
 // Turn down the brightness (max is 255)
 #define RGBLIGHT_LIMIT_VAL 64
+// Rainbow cycle effect
+#define RGBLIGHT_EFFECT_RAINBOW_MOOD
+#define RGBLIGHT_DEFAULT_MODE RGBLIGHT_MODE_RAINBOW_MOOD
 
 //--------------------------------------------
 // Encoder and dip switch config
@@ -97,10 +98,13 @@
 // Step size for each led matrix increase or decrease call. Range is 0-255
 #define LED_MATRIX_VAL_STEP 24
 
-// #define LED_MATRIX_SPLIT { 36, 36 }
-// #define SPLIT_TRANSPORT_MIRROR
-
 // // Turn down the brightness
 // #define LED_BRIGHTNESS_LO 100
 // #define LED_MATRIX_DEFAULT_VAL LED_BRIGHTNESS_LO
 // #define ENABLE_LED_MATRIX_BAND
+
+// Turn off LEDs after computer goes to sleep
+#define LED_DISABLE_WHEN_USB_SUSPENDED
+
+// Try to lighten LED processing load by limiting updates to 10fps
+#define LED_MATRIX_LED_FLUSH_LIMIT 100
