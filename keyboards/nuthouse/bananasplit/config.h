@@ -82,6 +82,10 @@
 // For split dip switch
 #define SPLIT_TRANSACTION_IDS_KB KEYBOARD_SYNC_DIP
 
+// DFU mode on dip switch
+#define DFU_NUMBER_DIP_SWITCH_PRESSES 3
+#define DFU_DIP_SWITCH_TIMEOUT_MS 200
+
 // Synchronization min period
 #define SLAVE_HANDLER_MIN_PERIOD_MS 50
 
