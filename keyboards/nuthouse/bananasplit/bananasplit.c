@@ -28,13 +28,16 @@ void keyboard_pre_init_kb(void){
     setPinInputHigh(ENCODER_RIGHT_PAD_A);
     setPinInputHigh(ENCODER_RIGHT_PAD_B);
 
+    // Configure the encoder switch pin
+    setPinInputHigh(DIP_SWITCH_PIN);
+
     // Configure the encoder pins as interrupt inputs
     PCMSK0 |= (0x1 << (ENCODER_RIGHT_PAD_A & 0b00001111)) | (0x1 << (ENCODER_RIGHT_PAD_B & 0b00001111));
     PCICR |= 0b00000001;
 
     // Configure the encoder dip switch as interrupt inputs as well
-    EICRB |= 0b00100000;
-    EIMSK |= 0b01000000;
+    EICRB = 0b00000000;
+    EIMSK = 0b01000000;
 
     // User logic
     keyboard_pre_init_user();
@@ -114,7 +117,10 @@ bool encoder_update_kb(uint8_t index, bool clockwise) {
 static uint32_t last_pressed_time = 0;
 static uint8_t dfu_state_counter = 0;
 ISR(INT6_vect){
-    if(timer_elapsed32(last_pressed_time) < DFU_DIP_SWITCH_TIMEOUT_MS){
+    const uint32_t elapsed_time = timer_elapsed32(last_pressed_time);
+    if(elapsed_time < DIP_SWITCH_DEBOUNCE_MS){
+        return;
+    } else if(elapsed_time < DFU_DIP_SWITCH_TIMEOUT_MS){
         dfu_state_counter++;
         if(dfu_state_counter == (DFU_NUMBER_DIP_SWITCH_PRESSES - 1)){
             reset_keyboard();
