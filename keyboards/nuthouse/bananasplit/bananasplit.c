@@ -36,7 +36,7 @@ void keyboard_pre_init_kb(void){
     PCICR |= 0b00000001;
 
     // Configure the encoder dip switch as interrupt inputs as well
-    EICRB = 0b00000000;
+    EICRB = 0b00110000;
     EIMSK = 0b01000000;
 
     // User logic
