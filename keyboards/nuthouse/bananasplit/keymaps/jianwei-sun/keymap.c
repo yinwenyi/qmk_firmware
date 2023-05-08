@@ -29,14 +29,14 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //├────────┼────────┼────────┤├────────┼────────┼────────┼────────┼────────┼────────┤                          ├────────┼────────┼────────┼────────┼────────┼────────┤├────────┼────────┼────────┤
                KC_CAPS,            KC_TAB, KC_A,    KC_S,    KC_D,    KC_F,    KC_G,                               KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_QUOT,           KC_UP,
   //├────────┼────────┼────────┤├────────┼────────┼────────┼────────┼────────┼────────┤                          ├────────┼────────┼────────┼────────┼────────┼────────┤├────────┼────────┼────────┤
-     KC_LALT, KC_LCMD, KC_LCTL,   KC_LSFT, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,                               KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_RSFT, KC_LEFT, KC_DOWN, KC_RIGHT,
+     KC_LCMD,  KC_LALT, KC_LCTL,  KC_LSFT, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,                               KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_RSFT, KC_LEFT, KC_DOWN, KC_RIGHT,
   //└────────┴────────┴────────┘└────────┴────────┼────────┼────────┼────────┼────────┼────────┐        ┌────────┼────────┼────────┼────────┴────────┴────────┴────────┘└────────┴────────┴────────┘
                                                                                KC_SPC, KC_BSPC,           KC_ENT,  KC_SPC
   //                                                                         └────────┴────────┘        └────────┴────────┘
   )
 };
 
-// The default behavior for the encoder dip switch does notion. The keyboard has setup the dip switch
+// The default behavior for the encoder dip switch does nothing. The keyboard has setup the dip switch
 // such that index = 0 is the right side and index = 1 is the left side
 bool dip_switch_update_user(uint8_t index, bool active) { 
    switch(index){
