@@ -76,11 +76,17 @@
 #define ENCODER_DETENTS 24
 
 // Push button pin
-#define DIP_SWITCH_PINS_RIGHT { E6 }
-#define DIP_SWITCH_PINS { E6 }
+#define DIP_SWITCH_PIN E6
+#define DIP_SWITCH_PINS_RIGHT { DIP_SWITCH_PIN }
+#define DIP_SWITCH_PINS { DIP_SWITCH_PIN }
 
 // For split dip switch
 #define SPLIT_TRANSACTION_IDS_KB KEYBOARD_SYNC_DIP
+#define DIP_SWITCH_DEBOUNCE_MS 50
+
+// DFU mode on dip switch
+#define DFU_NUMBER_DIP_SWITCH_PRESSES 3
+#define DFU_DIP_SWITCH_TIMEOUT_MS 300
 
 // Synchronization min period
 #define SLAVE_HANDLER_MIN_PERIOD_MS 50
