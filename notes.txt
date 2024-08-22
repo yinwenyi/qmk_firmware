@@ -1,0 +1,1 @@
+qmk compile -kb nuthouse/bananasplit -km jianwei-sun -j 8
